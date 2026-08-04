@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from routes.auth import router as auth_router
 from routes.users import router as users_router
 import logging
+from routes.jobs import router as jobs_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,9 +14,16 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
 app = FastAPI(
     title="FastAPI Backend",
     version="1.0.0"
+)
+
+app.include_router(
+    jobs_router,
+    prefix="/jobs",
+    tags=["Jobs"]
 )
 
 app.add_middleware(
