@@ -1,5 +1,8 @@
 from sqlalchemy.orm import Session
 from models.job import Job
+from workers.tasks import process_job
+
+
 
 def create_job(db: Session, job):
 
@@ -13,5 +16,6 @@ def create_job(db: Session, job):
     db.add(new_job)
     db.commit()
     db.refresh(new_job)
+    process_job.delay(new_job.id, new_job.job_type)
 
     return new_job

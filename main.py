@@ -6,6 +6,8 @@ from routes.auth import router as auth_router
 from routes.users import router as users_router
 import logging
 from routes.jobs import router as jobs_router
+from core.database import Base, engine
+from models.job import Job
 
 logging.basicConfig(
     level=logging.INFO,
