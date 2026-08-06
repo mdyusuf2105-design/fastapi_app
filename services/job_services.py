@@ -5,7 +5,6 @@ from workers.tasks import process_job
 
 
 def create_job(db: Session, job):
-
     new_job = Job(
         job_type=job.job_type,
         payload=job.payload,
@@ -16,6 +15,13 @@ def create_job(db: Session, job):
     db.add(new_job)
     db.commit()
     db.refresh(new_job)
-    process_job.delay(new_job.id, new_job.job_type)
+
+    print(f"Sending Job {new_job.id} to queue {new_job.priority.lower()}")
+    
+    process_job.apply_async(
+        args=[new_job.id, new_job.job_type],
+        queue=new_job.priority.lower(),
+        routing_key=new_job.priority.lower(),
+    )
 
     return new_job

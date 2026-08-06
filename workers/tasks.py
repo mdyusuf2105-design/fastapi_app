@@ -5,9 +5,10 @@ from core.database import SessionLocal
 from models.job import Job
 
 
-@celery.task
-def process_job(job_id, job_type):
+@celery.task(bind=True, max_retries=3)
+def process_job(self, job_id, job_type):
     db = SessionLocal()
+    job = None
 
     try:
         job = db.query(Job).filter(Job.id == job_id).first()
@@ -20,17 +21,26 @@ def process_job(job_id, job_type):
 
         print(f"Processing {job_type}...")
 
-        time.sleep(10)   # simulate long task
+        time.sleep(20)
 
         job.status = "Completed"
         db.commit()
 
         print(f"Completed Job {job_id}")
 
-    except Exception:
+    except Exception as exc:
+        if self.request.retries < self.max_retries:
+            if job:
+                job.retry_count = self.request.retries
+                db.commit()
+
+            raise self.retry(exc=exc, countdown=5)
+
         if job:
+            job.retry_count = self.max_retries
             job.status = "Failed"
             db.commit()
+
         raise
 
     finally:
