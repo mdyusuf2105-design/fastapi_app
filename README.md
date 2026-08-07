@@ -358,4 +358,4 @@ The application is designed to scale by:
 
 **Mohamed Yusuf U**
 
-GitHub: https://github.com/mdyusuf2105-design
+GitHub: https://github.com/mdyusuf2105-design/fastapi_app
