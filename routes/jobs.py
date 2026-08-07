@@ -5,6 +5,7 @@ from models.job import Job
 from schemas.job import JobCreate
 from services.job_services import create_job
 from core.database import SessionLocal
+from services.dashboard_service import get_dashboard
 
 router = APIRouter()
 
@@ -23,3 +24,7 @@ def create_new_job(job: JobCreate,
 @router.get("/")
 def get_jobs(db: Session = Depends(get_db)):
     return db.query(Job).all()
+
+@router.get("/dashboard")
+def dashboard():
+    return get_dashboard()
